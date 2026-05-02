@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Meta Tags for Link Sharing (Open Graph & Twitter Cards) -->
+    <title>The Visible and the Invisible: Navigating London in 1870</title>
+    <meta name="description" content="An interactive historical exploration of 1870s London. Discover the visible city and the invisible systems that kept it running.">
+    
+    <!-- Open Graph (Facebook, LinkedIn, typical LMS) -->
+    <meta property="og:title" content="London 1870: The Visible and the Invisible">
+    <meta property="og:description" content="An interactive historical exploration of 1870s London. Discover the visible city and the invisible systems that kept it running.">
+    <!-- If the preview fails on GitHub, replace 'victorian.png' below with your full live URL -->
+    <meta property="og:image" content="victorian.png">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="London 1870: The Visible and the Invisible">
+    <meta name="twitter:description" content="An interactive historical exploration of 1870s London.">
+    <meta name="twitter:image" content="victorian.png">
+
+    <style>
+        :root {
+            --primary-dark: #1a1c20;
+            --secondary-dark: #2c3036;
+            --accent-gold: #c5a059;
+            --text-light: #e0e0e0;
+            --text-dark: #111;
+            --visible-bg: #4a5c6a;
+            --invisible-bg: #3b2f2f;
+            --correct-green: #2e7d32;
+            --incorrect-red: #c62828;
+            --accent-blue: #4a90e2;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--secondary-dark);
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Pushes content to opposite sides */
+            border-bottom: 3px solid var(--accent-gold);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        header img.logo-img {
+            max-height: 80px;
+            margin-right: 30px;
+        }
+
+        header img.victorian-img {
+            max-height: 80px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: var(--accent-gold);
+            letter-spacing: 1px;
+        }
+
+        /* Full Width Responsive Video Section */
+        .hero-video-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 30px auto 0;
+            padding: 0 40px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; 
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            border: 2px solid var(--accent-gold);
+            background-color: #000;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .fallback-btn {
+            background: transparent;
+            border: none;
+            color: #777;
+            font-size: 0.8em;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 5px 0 0 0;
+            float: right;
+            transition: color 0.3s ease;
+        }
+
+        .fallback-btn:hover {
+            color: var(--accent-gold);
+        }
+
+        .video-caption {
+            font-size: 0.95em;
+            color: #ccc;
+            margin-top: 30px; 
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            clear: both;
+        }
+
+        .video-caption a {
+            color: var(--accent-gold);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Collapsible Glossary */
+        .glossary-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto 0;
+            padding: 0 40px;
+            box-sizing: border-box;
+        }
+
+        details.glossary-collapsible {
+            background-color: var(--secondary-dark);
+            border: 1px solid #444;
+            border-left: 5px solid var(--accent-gold);
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        details.glossary-collapsible summary {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--accent-gold);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+
+        details.glossary-collapsible summary::-webkit-details-marker { display: none; }
+        details.glossary-collapsible summary::before { content: "📚 ➕"; margin-right: 10px; font-size: 0.9em; }
+        details.glossary-collapsible[open] summary::before { content: "📚 ➖"; }
+
+        .glossary-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            margin-top: 15px;
+        }
+
+        .print-btn {
+            background-color: transparent;
+            color: var(--accent-gold);
+            border: 2px solid var(--accent-gold);
+            padding: 8px 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .print-btn:hover { background-color: var(--accent-gold); color: var(--primary-dark); }
+
+        .glossary-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .glossary-category {
+            grid-column: 1 / -1;
+            font-size: 1.2em;
+            color: #fff;
+            border-bottom: 1px dashed #555;
+            padding-bottom: 5px;
+            margin-top: 10px;
+        }
+
+        /* Main Content Layout */
+        main {
+            flex: 1;
+            padding: 30px 40px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .section-title {
+            color: var(--accent-gold);
+            font-size: 1.8em;
+            border-bottom: 2px solid var(--accent-gold);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        /* Full Width Quiz Section (2 Columns) */
+        .quiz-wrapper { width: 100%; }
+        
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-grid { grid-template-columns: 1fr; } 
+        }
+
+        .quiz-card {
+            background-color: var(--secondary-dark);
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 4px solid var(--accent-gold);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quiz-card p { margin-top: 0; font-size: 1.1em; font-weight: 500; flex-grow: 1; }
+
+        .quiz-buttons { display: flex; gap: 10px; margin-top: 15px; }
+
+        .tf-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            border: 2px solid #555;
+            background-color: transparent;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tf-btn:hover:not(:disabled) { background-color: #444; border-color: #777; }
+        .tf-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+        .tf-btn.selected-correct { background-color: var(--correct-green); border-color: var(--correct-green); opacity: 1; }
+        .tf-btn.selected-incorrect { background-color: var(--incorrect-red); border-color: var(--incorrect-red); opacity: 1; }
+
+        .quiz-feedback {
+            margin-top: 15px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 0.95em;
+            display: none;
+            background-color: #222;
+            border-left: 3px solid;
+        }
+
+        .feedback-correct { border-left-color: var(--correct-green); }
+        .feedback-incorrect { border-left-color: var(--incorrect-red); }
+
+        /* Data Explorer & Monologue Row */
+        .explorer-creative-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .explorer-container, .creative-container {
+            background-color: var(--secondary-dark);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .creative-prompt {
+            background-color: #222;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid var(--accent-blue);
+            flex-grow: 1;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        /* Tabs */
+        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+        
+        .tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 10px;
+            font-size: 1.05em;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #444;
+            color: #fff;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover { background-color: #555; }
+        .tab-btn.active { background-color: var(--accent-gold); color: var(--text-dark); }
+
+        .data-display {
+            background-color: #222;
+            padding: 30px;
+            border-radius: 8px;
+            flex: 1;
+            display: none;
+            position: relative;
+        }
+
+        .data-display.active { display: block; animation: fadeIn 0.5s; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .visible-badge { background-color: var(--visible-bg); color: #fff; }
+        .invisible-badge { background-color: var(--invisible-bg); color: #ffd700; border: 1px solid #ff4444; }
+
+        .data-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+        .data-label { font-weight: bold; color: var(--accent-gold); font-size: 1.1em;}
+        .data-value { font-size: 1.1em; }
+
+        /* Full Width Letter Container */
+        .letter-container {
+            background-color: var(--secondary-dark);
+            border-radius: 8px;
+            padding: 30px;
+            border-top: 4px solid var(--accent-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            margin-top: 20px;
+        }
+
+        .letter-container p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        footer {
+            background-color: var(--secondary-dark);
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #444;
+            font-size: 1.1em;
+            color: #aaa;
+            margin-top: auto;
+        }
+
+        /* --- ADVANCED PRINT STYLES --- */
+        .print-only-title, .print-card-title { display: none; }
+        
+        @media print {
+            body { background-color: #fff; color: #000; }
+            header { background-color: #fff; border-bottom: 2px solid #000; padding: 10px 0; margin-bottom: 20px; align-items: center; }
+            header h1 { color: #000; }
+            footer { background-color: #fff; color: #000; border-top: 2px solid #000; position: fixed; bottom: 0; width: 100%; padding: 10px 0; display: block !important; }
+            
+            /* Hide elements not needed in ANY print view */
+            .hero-video-container { display: none !important; }
+            button { display: none !important; }
+
+            /* Color fixes for standard browser print */
+            .section-title, .data-label, .glossary-category, .quiz-card p { color: #000 !important; }
+            .quiz-card, .creative-prompt, .data-display, .letter-container { background-color: #fff !important; border: 1px solid #ccc; color: #000; }
+            .status-badge { border: 1px solid #000; color: #000 !important; background: transparent !important; }
+
+            /* 1. GLOSSARY PRINT MODE */
+            body.printing-glossary main { display: none !important; }
+            body.printing-glossary .glossary-wrapper { width: 100%; max-width: none; margin: 0; padding: 20px; }
+            body.printing-glossary .print-only-title { display: block; font-size: 2em; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; color: #000; }
+            body.printing-glossary details.glossary-collapsible { border: none; padding: 0; background: transparent; box-shadow: none; }
+            body.printing-glossary details summary, body.printing-glossary .glossary-header-actions { display: none !important; }
+            body.printing-glossary .glossary-content { display: block !important; }
+            body.printing-glossary .glossary-content > div { margin-bottom: 15px; page-break-inside: avoid; }
+            body.printing-glossary .glossary-category { border-bottom: 2px solid #000; font-weight: bold; margin-top: 30px; font-size: 1.4em; }
+
+            /* 2. CARD PRINT MODE */
+            body.printing-card .glossary-wrapper,
+            body.printing-card .quiz-wrapper, 
+            body.printing-card .creative-container, 
+            body.printing-card .letter-container,
+            body.printing-card .tabs { display: none !important; }
+            
+            body.printing-card main { display: block !important; padding: 0; margin: 0; }
+            body.printing-card .explorer-creative-row { display: block; }
+            body.printing-card .explorer-container { box-shadow: none; border: none; padding: 0; background: transparent; }
+            body.printing-card .section-title { display: none !important; } 
+            
+            body.printing-card .data-display.active { 
+                display: block !important; 
+                border: 3px solid #000; 
+                padding: 50px; 
+                margin-top: 40px; 
+                font-size: 1.4em; 
+                border-radius: 0;
+            }
+            body.printing-card .card-header { margin-bottom: 40px; }
+            body.printing-card .status-badge { border: 3px solid #000; padding: 10px 20px; font-size: 1.2em; }
+            body.printing-card .data-grid { gap: 40px; }
+            
+            body.printing-card .print-card-title {
+                display: block;
+                font-size: 2.5em;
+                font-weight: bold;
+                text-transform: uppercase;
+                margin-bottom: 20px;
+                color: #000;
+                text-align: center;
+                border-bottom: 2px dashed #000;
+                padding-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="logo.png" alt="School Logo" class="logo-img" onerror="this.style.display='none'">
+            <h1>London 1870: The Visible and the Invisible</h1>
+        </div>
+        <img src="victorian.png" alt="Victorian London" class="victorian-img" onerror="this.style.display='none'">
+    </header>
+
+    <!-- Full Width Video Projection -->
+    <section class="hero-video-container">
+        <div class="video-wrapper">
+            <!-- Using the direct Facebook Plugin URL -->
+            <iframe id="main-video-frame" src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F943335435147054%2F&show_text=false&width=560&t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+        </div>
+        <button class="fallback-btn" onclick="switchVideo()" id="fallback-btn" title="Try loading the alternate Google Drive feed">Video not loading? Try alternate link.</button>
+        
+        <div class="video-caption">
+            Historical Visualization generated and provided by <strong><a href="https://www.facebook.com/HistoryReloadedOfficial" target="_blank">History Reloaded</a></strong>. 
+        </div>
+    </section>
+
+    <!-- Collapsible Glossary Section -->
+    <div class="glossary-wrapper">
+        <h2 class="print-only-title">Language & History Glossary</h2>
+        <details class="glossary-collapsible" id="glossary-details">
+            <summary>Language & History Glossary</summary>
+            
+            <div class="glossary-header-actions">
+                <span style="font-size: 0.9em; font-style: italic; color: #aaa;">Reference vocabulary and history terms from the transcript.</span>
+                <button class="print-btn" onclick="printGlossary()">🖨️ Print Glossary to PDF</button>
+            </div>
+
+            <div class="glossary-content">
+                <!-- Language Context -->
+                <div class="glossary-category">Language & Vocabulary Context</div>
+                <div><span class="data-label">Pressed Into:</span> Crammed or forced into a small space<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Fraction:</span> A small part or proportion of a whole<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Manure:</span> Animal excrement, specifically from horses<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Sulphurous:</span> Having the pungent, toxic smell of sulfur<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Undertone:</span> A subdued or underlying quality or feeling<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Baseline:</span> A minimum or starting point<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Rumbles:</span> Makes a continuous deep, resonant sound<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Sparks:</span> Small flashes of light produced by friction<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Gutter:</span> A shallow trough beneath the edge of a road<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Negotiate:</span> To find a way over or through a difficult path<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Precision:</span> The quality of being exact and accurate<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Dung:</span> The excrement of animals; manure<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Birch Twigs:</span> Small branches from a tree, used as a broom<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Scanning:</span> Looking at all parts of something carefully<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Copper:</span> A red-brown metal often used for cheap nails/coins<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Sewers:</span> Underground conduits for carrying off waste matter<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Yields:</span> Produces or provides<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Surplus:</span> An excess amount; left over<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Dusk:</span> The darker stage of twilight<span style="display:none;">[cite: 2]</span>.</div>
+
+                <!-- History Context -->
+                <div class="glossary-category">Historical & Cultural Context</div>
+                <div><span class="data-label">Cheapside:</span> A major historic commercial street in London<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Bread Street:</span> A historic street located just off Cheapside<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Islington:</span> A district where many clerical workers lived<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Fourpence / Shillings:</span> Pre-decimal currency. 12 pence = 1 shilling<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Mudlarks:</span> Scavengers who searched the muddy shores of the Thames<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Victoria Embankment:</span> Project built to house the new main sewer<span style="display:none;">[cite: 2]</span>.</div>
+                <div><span class="data-label">Bazalgette's:</span> The engineer responsible for London's sewer network<span style="display:none;">[cite: 2]</span>.</div>
+            </div>
+        </details>
+    </div>
+
+    <main>
+        <!-- Full Width Interactive Practice Quiz (2 Columns) -->
+        <div class="quiz-wrapper">
+            <h2 class="section-title">Interactive Practice: True or False?</h2>
+            <div class="quiz-grid">
+                <div class="quiz-card" id="q1-card">
+                    <p>1. London's population in 1870 was approximately four million people.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q1-true" onclick="checkAnswer(1, true)">True</button>
+                        <button class="tf-btn" id="q1-false" onclick="checkAnswer(1, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-1"></div>
+                </div>
+
+                <div class="quiz-card" id="q2-card">
+                    <p>2. The streets were permanently wet because it rained constantly in London.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q2-true" onclick="checkAnswer(2, true)">True</button>
+                        <button class="tf-btn" id="q2-false" onclick="checkAnswer(2, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-2"></div>
+                </div>
+
+                <div class="quiz-card" id="q3-card">
+                    <p>3. An omnibus ride cost fourpence, making it an affordable daily option for clerks.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q3-true" onclick="checkAnswer(3, true)">True</button>
+                        <button class="tf-btn" id="q3-false" onclick="checkAnswer(3, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-3"></div>
+                </div>
+
+                <div class="quiz-card" id="q4-card">
+                    <p>4. A street sweeper boy was guaranteed to earn at least sixpence every day.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q4-true" onclick="checkAnswer(4, true)">True</button>
+                        <button class="tf-btn" id="q4-false" onclick="checkAnswer(4, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-4"></div>
+                </div>
+
+                <div class="quiz-card" id="q5-card">
+                    <p>5. Mudlarks worked primarily at low tide to search the exposed mud.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q5-true" onclick="checkAnswer(5, true)">True</button>
+                        <button class="tf-btn" id="q5-false" onclick="checkAnswer(5, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-5"></div>
+                </div>
+
+                <div class="quiz-card" id="q6-card">
+                    <p>6. Mudlarks usually found highly valuable items like gold rings in the Thames.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q6-true" onclick="checkAnswer(6, true)">True</button>
+                        <button class="tf-btn" id="q6-false" onclick="checkAnswer(6, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-6"></div>
+                </div>
+
+                <div class="quiz-card" id="q7-card">
+                    <p>7. "Setts" were rectangular wooden blocks used to construct the buildings.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q7-true" onclick="checkAnswer(7, true)">True</button>
+                        <button class="tf-btn" id="q7-false" onclick="checkAnswer(7, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-7"></div>
+                </div>
+
+                <div class="quiz-card" id="q8-card">
+                    <p>8. Joseph Bazalgette was responsible for designing the new sewer network.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q8-true" onclick="checkAnswer(8, true)">True</button>
+                        <button class="tf-btn" id="q8-false" onclick="checkAnswer(8, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-8"></div>
+                </div>
+
+                <div class="quiz-card" id="q9-card">
+                    <p>9. The new sewers completely removed the city's waste problem from existence.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q9-true" onclick="checkAnswer(9, true)">True</button>
+                        <button class="tf-btn" id="q9-false" onclick="checkAnswer(9, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-9"></div>
+                </div>
+
+                <div class="quiz-card" id="q10-card">
+                    <p>10. The video argues the city produced a surplus of both filth and people.</p>
+                    <div class="quiz-buttons">
+                        <button class="tf-btn" id="q10-true" onclick="checkAnswer(10, true)">True</button>
+                        <button class="tf-btn" id="q10-false" onclick="checkAnswer(10, false)">False</button>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-10"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Explorer & Monologue Row -->
+        <div class="explorer-creative-row">
+            
+            <!-- Left: Interactive Explorer -->
+            <div class="explorer-container">
+                <h2 class="section-title" style="border-bottom-color: #444; color: #fff;">Data Explorer</h2>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showData('clerk')">The Clerk</button>
+                    <button class="tab-btn" onclick="showData('sweeper')">The Sweeper</button>
+                    <button class="tab-btn" onclick="showData('mudlark')">The Mudlark</button>
+                    <button class="tab-btn" onclick="showData('lamplighter')">Lamplighter</button>
+                </div>
+
+                <!-- Clerk Data -->
+                <div id="clerk" class="data-display active">
+                    <div class="print-card-title">Role: The Clerk</div>
+                    <div class="card-header">
+                        <div class="status-badge visible-badge">Status: The Visible City</div>
+                        <button class="print-btn" onclick="printCard('clerk')">🖨️ Print Card</button>
+                    </div>
+                    <div class="data-grid">
+                        <div class="data-label">Wage:</div><div class="data-value">15 shillings a week<span style="display:none;">[cite: 1]</span>.</div>
+                        <div class="data-label">Commute:</div><div class="data-value">Walks in from Islington because the omnibus costs fourpence<span style="display:none;">[cite: 1]</span>.</div>
+                        <div class="data-label">Environment:</div><div class="data-value">Negotiates narrow pavements. Calculating speed and gap with precision<span style="display:none;">[cite: 1]</span>.</div>
+                    </div>
+                </div>
+
+                <!-- Sweeper Data -->
+                <div id="sweeper" class="data-display">
+                    <div class="print-card-title">Role: The Sweeper Boy</div>
+                    <div class="card-header">
+                        <div class="status-badge invisible-badge">Status: The Invisible System</div>
+                        <button class="print-btn" onclick="printCard('sweeper')">🖨️ Print Card</button>
+                    </div>
+                    <div class="data-grid">
+                        <div class="data-label">Age & Hours:</div><div class="data-value">Age 11. Works off Cheapside from 5 AM until dark<span style="display:none;">[cite: 1]</span>.</div>
+                        <div class="data-label">Wage:</div><div class="data-value">6 pence on a good day. Nothing on a bad day<span style="display:none;">[cite: 1]</span>.</div>
+                        <div class="data-label">Environment:</div><div class="data-value">Sweeps a path through mud and dung. Sleeps under a bridge if he cannot pay<span style="display:none;">[cite: 1]</span>.</div>
+                    </div>
+                </div>
+
+                <!-- Mudlark Data -->
+                <div id="mudlark" class="data-display">
+                    <div class="print-card-title">Role: The Mudlark</div>
+                    <div class="card-header">
+                        <div class="status-badge invisible-badge">Status: The Invisible System</div>
+                        <button class="print-btn" onclick="printCard('mudlark')">🖨️ Print Card</button>
+                    </div>
+                    <div class="data-grid">
+                        <div class="data-label">Location:</div><div class="data-value">Below London Bridge at low tide<span style="display:none;">[cite: 1]</span>.</div>
+                        <div class="data-label">Wage:</div><div class="data-value">1 penny for a productive hour<span style="display:none;">[cite: 1]</span>.</div>
+                        <div class="data-label">Environment:</div><div class="data-value">Wades barefoot in black Thames mud, scanning by touch for copper nails<span style="display:none;">[cite: 1]</span>.</div>
+                    </div>
+                </div>
+
+                <!-- Lamplighter Data -->
+                <div id="lamplighter" class="data-display">
+                    <div class="print-card-title">Role: The Lamplighter</div>
+                    <div class="card-header">
+                        <div class="status-badge visible-badge">Status: The Visible City</div>
+                        <button class="print-btn" onclick="printCard('lamplighter')">🖨️ Print Card</button>
+                    </div>
+                    <div class="data-grid">
+                        <div class="data-label">Location:</div><div class="data-value">The Victoria Embankment at dusk<span style="display:none;">[cite: 1]</span>.</div>
+                        <div class="data-label">Role:</div><div class="data-value">Moves along the row with a brass pole. Flames catch, flare, and settle<span style="display:none;">[cite: 1]</span>.</div>
+                        <div class="data-label">Environment:</div><div class="data-value">Works on the "calm surface" above Bazalgette’s sewers<span style="display:none;">[cite: 1]</span>.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: The Monologue Application -->
+            <div class="creative-container">
+                <h2 class="section-title" style="border-bottom-color: var(--accent-blue); color: var(--accent-blue);">Creative Application: The Monologue</h2>
+                <div class="creative-prompt">
+                    <p><strong>The Task:</strong> Drama in the Streets</p>
+                    <p>Select <strong>any of the four roles</strong> from the Data Explorer. Imagine you are this person in 1870. A wealthy Londoner has just stopped to stare at you.</p>
+                    <p>Write a 1-minute dramatic monologue directed at this stranger. You must weave the hard facts from your Data Card (wages, conditions, location) into your story to explain the reality of your daily survival.</p>
+                    
+                    <h4 style="color: var(--accent-gold); margin-top: 20px; border-bottom: 1px solid #444; padding-bottom: 5px;">Actor's Hints:</h4>
+                    <ul style="margin-top: 10px; padding-left: 20px; line-height: 1.6;">
+                        <li><strong>The Sweeper & Mudlark:</strong> Focus on the sheer physical toll of your environment, the cold, and the desperation for just a few pence.</li>
+                        <li><strong>The Clerk:</strong> Focus on middle-class anxiety. You walk for miles to avoid the omnibus fare, yet you are pressured to look perfectly respectable while dodging manure.</li>
+                        <li><strong>The Lamplighter:</strong> You are the observer. You stand exactly between the visible city of light and the invisible river of waste beneath your feet.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Full Width Letter to The Times Container -->
+        <div class="letter-container">
+            <h2 class="section-title" style="border-bottom-color: var(--accent-blue); color: var(--accent-blue); margin-bottom: 15px;">Creative Application: Letter to The Times</h2>
+            <p>Adopt the persona of an upper-class Londoner (such as a wealthy merchant or politician) who has just realized how the city functions beneath its calm surface.</p>
+            <p>Using the data from the Explorer, write a formal letter to the editor of a newspaper arguing for better conditions for the "surplus people" who keep the city running. Explain the harsh contrast between the visible and invisible systems you have witnessed.</p>
+        </div>
+
+    </main>
+
+    <footer>
+        Panagiotis Domvros, English & Drama Teacher, Principal of 1st Middle School of Pylea
+    </footer>
+
+    <script>
+        // Video Toggle Logic
+        function switchVideo() {
+            const frame = document.getElementById('main-video-frame');
+            const btn = document.getElementById('fallback-btn');
+            
+            // Check current src and toggle
+            if (frame.src.includes('facebook.com')) {
+                // Switch to Google Drive
+                frame.src = 'https://drive.google.com/file/d/1g6XS5Qar_S2x1uJ1t6bs44m1FJz9uZL_/preview';
+                btn.innerHTML = 'Switch back to high-quality Facebook link';
+            } else {
+                // Switch back to Facebook
+                frame.src = 'https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Freel%2F943335435147054%2F&show_text=false&width=560&t=0';
+                btn.innerHTML = 'Video not loading? Try alternate link.';
+            }
+        }
+
+        // Data and Feedback for the Quiz
+        const quizData = {
+            1: { correct: true, feedback: "Correct! There were four million people pressed into the streets." },
+            2: { correct: false, feedback: "Incorrect. The streets were permanently wet 'not from rain, but from horse urine and gutter overflow.'" },
+            3: { correct: false, feedback: "Incorrect. The omnibus cost fourpence, which was too expensive for clerks earning 15 shillings a week." },
+            4: { correct: false, feedback: "Incorrect. Rain was good for business, but 'a bad day earns nothing'." },
+            5: { correct: true, feedback: "Correct! They worked 'below London Bridge, at low tide' when the mud was exposed." },
+            6: { correct: false, feedback: "Incorrect. They searched by touch for low-value items like 'copper nails and coins'." },
+            7: { correct: false, feedback: "Incorrect. Setts were rectangular granite blocks used to pave the streets." },
+            8: { correct: true, feedback: "Correct! 'Bazalgette's sewers carry what once flowed openly into the river.'" },
+            9: { correct: false, feedback: "Incorrect. The video emphasizes that 'the filth has been redirected, not removed.'" },
+            10: { correct: true, feedback: "Correct! These occupations existed 'because the city produces surplus filth and surplus people.'" }
+        };
+
+        // Quiz Logic
+        function checkAnswer(qNumber, userChoice) {
+            const data = quizData[qNumber];
+            const trueBtn = document.getElementById(`q1-true`).id.replace('1', qNumber);
+            const falseBtn = document.getElementById(`q1-false`).id.replace('1', qNumber);
+            const feedbackDiv = document.getElementById(`feedback-${qNumber}`);
+            
+            document.getElementById(trueBtn).disabled = true;
+            document.getElementById(falseBtn).disabled = true;
+
+            const isCorrect = userChoice === data.correct;
+            const selectedBtnId = userChoice ? trueBtn : falseBtn;
+            document.getElementById(selectedBtnId).classList.add(isCorrect ? 'selected-correct' : 'selected-incorrect');
+
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.innerHTML = `<strong>${isCorrect ? '✓' : '✗'}</strong> ${data.feedback}`;
+            feedbackDiv.classList.add(isCorrect ? 'feedback-correct' : 'feedback-incorrect');
+        }
+
+        // Tab switching logic for Explorer
+        function showData(roleId) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            const displays = document.querySelectorAll('.data-display');
+            displays.forEach(display => display.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(roleId).classList.add('active');
+        }
+
+        // Custom Print Logic: Isolates the Glossary
+        function printGlossary() {
+            document.body.classList.add('printing-glossary');
+            document.getElementById('glossary-details').setAttribute('open', '');
+            window.print();
+            document.body.classList.remove('printing-glossary');
+        }
+
+        // Custom Print Logic: Isolates a specific Character Card
+        function printCard(roleId) {
+            document.body.classList.add('printing-card');
+            showData(roleId); // Ensure the card they want to print is the active one
+            window.print();
+            document.body.classList.remove('printing-card');
+        }
+    </script>
+</body>
+</html>
